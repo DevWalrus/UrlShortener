@@ -41,5 +41,6 @@ resource "azurerm_cosmosdb_mongo_collection" "links" {
 
   index {
     keys = ["_id"]
+    unique = true
   }
 }

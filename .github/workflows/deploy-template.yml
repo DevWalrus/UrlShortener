@@ -1,0 +1,49 @@
+name: Deploy Template
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        required: true
+        type: string
+        description: "Folder name and image name, e.g. 'redirect' or 'creator-api'"
+      container_app_name:
+        required: true
+        type: string
+        description: "Azure Container App resource name"
+    secrets:
+      ACR_USERNAME:
+        required: true
+      ACR_PASSWORD:
+        required: true
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: clintenregistry.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ inputs.service_name }}
+          push:

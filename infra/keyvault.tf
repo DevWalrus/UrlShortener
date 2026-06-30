@@ -33,3 +33,11 @@ resource "azurerm_key_vault_secret" "registry_password" {
 
   depends_on = [azurerm_key_vault_access_policy.terraform]
 }
+
+resource "azurerm_key_vault_secret" "creator_api_key" {
+  name         = "creator-api-key"
+  value        = var.creator_api_key
+  key_vault_id = azurerm_key_vault.main.id
+
+  depends_on = [azurerm_key_vault_access_policy.terraform]
+}

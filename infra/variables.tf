@@ -9,3 +9,9 @@ variable "project" {
   type        = string
   default     = "clinten"
 }
+
+variable "creator_api_key" {
+  description = "Shared secret for authenticating requests to the creator API"
+  type        = string
+  sensitive   = true
+}

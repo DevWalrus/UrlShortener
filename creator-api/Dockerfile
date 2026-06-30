@@ -5,13 +5,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o redirect ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o creator-api ./cmd/main.go
 
 FROM alpine:3.19
 
 RUN apk --no-cache add ca-certificates
 WORKDIR /app
-COPY --from=builder /app/redirect .
+COPY --from=builder /app/creator-api .
 
 EXPOSE 8080
-CMD ["./redirect"]
+CMD ["./creator-api"]
