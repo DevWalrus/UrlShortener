@@ -1,0 +1,56 @@
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/DevWalrus/UrlShortener/redirect/internal/cache"
+	"github.com/DevWalrus/UrlShortener/redirect/internal/db"
+	"github.com/DevWalrus/UrlShortener/redirect/internal/handler"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+)
+
+func main() {
+    mongoURI := os.Getenv("MONGODB_URI")
+    if mongoURI == "" {
+        log.Fatal("MONGODB_URI environment variable is required")
+    }
+
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    mongoClient, err := db.Connect(ctx, mongoURI)
+    if err != nil {
+        log.Fatalf("failed to connect to mongodb: %v", err)
+    }
+    defer mongoClient.Disconnect(context.Background())
+
+    store := db.NewLinkStore(mongoClient, "clintendev", "links")
+    linkCache := cache.New(5*time.Minute, 10*time.Minute)
+    h := handler.New(store, linkCache)
+
+    r := chi.NewRouter()
+    r.Use(middleware.Logger)
+    r.Use(middleware.Recoverer)
+
+    r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+        w.WriteHeader(http.StatusOK)
+        w.Write([]byte("ok"))
+    })
+
+    r.Get("/{slug}", h.HandleRedirect)
+
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080"
+    }
+
+    log.Printf("starting server on :%s", port)
+    if err := http.ListenAndServe(":"+port, r); err != nil {
+        log.Fatalf("server failed: %v", err)
+    }
+}
