@@ -22,3 +22,11 @@ output "creator_ui_deployment_token" {
 output "key_vault_uri" {
   value = azurerm_key_vault.main.vault_uri
 }
+
+output "github_actions_client_id" {
+  value = azuread_application.github_actions.client_id
+}
+
+output "github_actions_tenant_id" {
+  value = data.azuread_client_config.current.tenant_id
+}

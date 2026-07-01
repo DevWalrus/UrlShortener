@@ -8,6 +8,7 @@ on:
       - 'redirect/**'
       - '.github/workflows/deploy-redirect.yml'
       - '.github/workflows/deploy-template.yml'
+  workflow_dispatch:
 
 permissions:
   id-token: write

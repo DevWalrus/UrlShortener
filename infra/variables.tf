@@ -15,3 +15,8 @@ variable "creator_api_key" {
   type        = string
   sensitive   = true
 }
+
+variable "subscription_id" {
+  description = "Azure subscription ID"
+  type        = string
+}

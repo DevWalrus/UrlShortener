@@ -8,6 +8,7 @@ on:
       - 'creator-api/**'
       - '.github/workflows/deploy-creator-api.yml'
       - '.github/workflows/deploy-template.yml'
+  workflow_dispatch:
 
 permissions:
   id-token: write
