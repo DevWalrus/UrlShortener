@@ -12,9 +12,12 @@ import (
 	customMiddleware "github.com/DevWalrus/UrlShortener/creator-api/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load(".env.local")
+
 	mongoURI := os.Getenv("MONGODB_URI")
 	if mongoURI == "" {
 		log.Fatal("MONGODB_URI environment variable is required")
@@ -38,7 +41,10 @@ func main() {
 
 	allowedOrigins := map[string]bool{
 		"https://create.clinten.dev": true,
-		"http://localhost:5173":      true,
+	}
+
+	if dev := os.Getenv("CORS_ORIGIN_DEV"); dev != "" {
+		allowedOrigins[dev] = true
 	}
 
 	// CORS for create.clinten.dev calling this API

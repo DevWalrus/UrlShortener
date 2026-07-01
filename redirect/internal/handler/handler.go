@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -13,12 +14,17 @@ import (
 )
 
 type Handler struct {
-	store *db.LinkStore
-	cache *cache.Cache
+	store       *db.LinkStore
+	cache       *cache.Cache
+	notFoundURL string
 }
 
 func New(store *db.LinkStore, cache *cache.Cache) *Handler {
-	return &Handler{store: store, cache: cache}
+	notFoundURL := os.Getenv("NOT_FOUND_URL")
+	if notFoundURL == "" {
+		notFoundURL = "https://create.clinten.dev/404"
+	}
+	return &Handler{store: store, cache: cache, notFoundURL: notFoundURL}
 }
 
 func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +34,7 @@ func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 	if dest, found := h.cache.Get(slug); found {
 		if dest == "" {
 			// Cached miss
-			h.renderNotFound(w)
+			h.renderNotFound(w, r)
 			return
 		}
 		h.store.IncrementHitCount(r.Context(), slug)
@@ -49,7 +55,7 @@ func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 
 	if link == nil {
 		h.cache.SetMiss(slug)
-		h.renderNotFound(w)
+		h.renderNotFound(w, r)
 		return
 	}
 
@@ -58,16 +64,6 @@ func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, link.Destination, http.StatusFound)
 }
 
-func (h *Handler) renderNotFound(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusNotFound)
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(`<!DOCTYPE html>
-<html>
-  <head><title>Not Found</title></head>
-  <body>
-    <h1>Link not found</h1>
-    <p>This short link doesn't exist or has expired.</p>
-    <a href="https://clinten.dev">clinten.dev</a>
-  </body>
-</html>`))
+func (h *Handler) renderNotFound(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, h.notFoundURL+"?slug="+chi.URLParam(r, "slug"), http.StatusFound)
 }

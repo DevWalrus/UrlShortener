@@ -12,45 +12,48 @@ import (
 	"github.com/DevWalrus/UrlShortener/redirect/internal/handler"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-    mongoURI := os.Getenv("MONGODB_URI")
-    if mongoURI == "" {
-        log.Fatal("MONGODB_URI environment variable is required")
-    }
+	godotenv.Load(".env.local")
 
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
+	mongoURI := os.Getenv("MONGODB_URI")
+	if mongoURI == "" {
+		log.Fatal("MONGODB_URI environment variable is required")
+	}
 
-    mongoClient, err := db.Connect(ctx, mongoURI)
-    if err != nil {
-        log.Fatalf("failed to connect to mongodb: %v", err)
-    }
-    defer mongoClient.Disconnect(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-    store := db.NewLinkStore(mongoClient, "clintendev", "links")
-    linkCache := cache.New(5*time.Minute, 10*time.Minute)
-    h := handler.New(store, linkCache)
+	mongoClient, err := db.Connect(ctx, mongoURI)
+	if err != nil {
+		log.Fatalf("failed to connect to mongodb: %v", err)
+	}
+	defer mongoClient.Disconnect(context.Background())
 
-    r := chi.NewRouter()
-    r.Use(middleware.Logger)
-    r.Use(middleware.Recoverer)
+	store := db.NewLinkStore(mongoClient, "clintendev", "links")
+	linkCache := cache.New(5*time.Minute, 10*time.Minute)
+	h := handler.New(store, linkCache)
 
-    r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-        w.WriteHeader(http.StatusOK)
-        w.Write([]byte("ok"))
-    })
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
-    r.Get("/{slug}", h.HandleRedirect)
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
 
-    port := os.Getenv("PORT")
-    if port == "" {
-        port = "8080"
-    }
+	r.Get("/{slug}", h.HandleRedirect)
 
-    log.Printf("starting server on :%s", port)
-    if err := http.ListenAndServe(":"+port, r); err != nil {
-        log.Fatalf("server failed: %v", err)
-    }
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("starting server on :%s", port)
+	if err := http.ListenAndServe(":"+port, r); err != nil {
+		log.Fatalf("server failed: %v", err)
+	}
 }

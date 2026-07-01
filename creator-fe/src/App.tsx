@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import Create from './pages/Create'
 import Home from './pages/Home'
 import List from './pages/List'
+import NotFound from './pages/NotFound'
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,8 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'create', element: <Create /> },
       { path: 'list', element: <List /> },
+      { path: '404', element: <NotFound /> },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ])
