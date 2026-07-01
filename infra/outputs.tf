@@ -3,11 +3,11 @@ output "container_registry_url" {
 }
 
 output "redirect_app_fqdn" {
-  value = azurerm_container_app.redirect.latest_revision_fqdn
+  value = azurerm_container_app.redirect.ingress[0].fqdn
 }
 
 output "creator_api_fqdn" {
-  value = azurerm_container_app.creator_api.latest_revision_fqdn
+  value = azurerm_container_app.creator_api.ingress[0].fqdn
 }
 
 output "creator_ui_hostname" {
@@ -21,4 +21,12 @@ output "creator_ui_deployment_token" {
 
 output "key_vault_uri" {
   value = azurerm_key_vault.main.vault_uri
+}
+
+output "aad_tenant_id" {
+  value = data.azuread_client_config.current.tenant_id
+}
+
+output "aad_client_id" {
+  value = azuread_application.creator_ui.client_id
 }

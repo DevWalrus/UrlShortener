@@ -1,22 +1,51 @@
 {
   "routes": [
     {
-      "route": "/images/*",
+      "route": "/assets/*",
+      "allowedRoles": ["authenticated"],
       "headers": {
         "cache-control": "public, max-age=31536000, immutable"
       }
     },
     {
-      "route": "/assets/*",
+      "route": "/images/*",
+      "allowedRoles": ["authenticated"],
       "headers": {
         "cache-control": "public, max-age=31536000, immutable"
       }
+    },
+    {
+      "route": "/.auth/login/aad",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/.auth/*",
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/*",
+      "allowedRoles": ["authenticated"],
       "rewrite": "/index.html"
     }
   ],
+  "responseOverrides": {
+    "401": {
+      "redirect": "/.auth/login/aad",
+      "statusCode": 302
+    }
+  },
+  "auth": {
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "userDetailsClaim": "emails",
+        "registration": {
+          "openIdIssuer": "https://login.microsoftonline.com/1c98acba-50be-4d6e-aa93-28785e0d33e8/v2.0",
+          "clientIdSettingName": "AAD_CLIENT_ID",
+          "clientSecretSettingName": "AAD_CLIENT_SECRET"
+        }
+      }
+    }
+  },
   "mimeTypes": {
     ".js": "application/javascript",
     ".css": "text/css",
