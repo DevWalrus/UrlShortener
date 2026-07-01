@@ -50,11 +50,24 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 
 	if req.CustomSlug != "" {
 		finalSlug = strings.ToUpper(req.CustomSlug)
+
+		if len(finalSlug) > 7 {
+			http.Error(w, "custom slug must be 7 characters or less", http.StatusBadRequest)
+			return
+		}
+
+		if !slug.IsValid(finalSlug) {
+			http.Error(w, "custom slug must contain only letters and numbers", http.StatusBadRequest)
+			return
+		}
+
 		exists, err := h.store.Exists(ctx, finalSlug)
+
 		if err != nil {
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
+
 		if exists {
 			http.Error(w, "slug already taken", http.StatusConflict)
 			return

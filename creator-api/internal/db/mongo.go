@@ -66,14 +66,13 @@ func (s *LinkStore) Delete(ctx context.Context, slug string) error {
 }
 
 func (s *LinkStore) List(ctx context.Context) ([]Link, error) {
-	// Only return active (non-deleted) links by default
 	cursor, err := s.collection.Find(ctx, bson.M{"deletedAt": bson.M{"$exists": false}})
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
-	var links []Link
+	links := []Link{}
 	if err := cursor.All(ctx, &links); err != nil {
 		return nil, err
 	}
@@ -87,7 +86,7 @@ func (s *LinkStore) ListDeleted(ctx context.Context) ([]Link, error) {
 	}
 	defer cursor.Close(ctx)
 
-	var links []Link
+	links := []Link{}
 	if err := cursor.All(ctx, &links); err != nil {
 		return nil, err
 	}

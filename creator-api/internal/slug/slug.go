@@ -25,3 +25,18 @@ func Generate() (string, error) {
 
 	return string(result), nil
 }
+
+// IsValid checks if a slug is valid (only letters and numbers, up to 7 characters).
+func IsValid(slug string) bool {
+	if len(slug) > length {
+		return false
+	}
+
+	for _, char := range slug {
+		if !((char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9')) {
+			return false
+		}
+	}
+
+	return true
+}
