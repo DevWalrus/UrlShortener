@@ -34,18 +34,6 @@
       "statusCode": 302
     }
   },
-  "auth": {
-    "identityProviders": {
-      "azureActiveDirectory": {
-        "userDetailsClaim": "emails",
-        "registration": {
-          "openIdIssuer": "https://login.microsoftonline.com/1c98acba-50be-4d6e-aa93-28785e0d33e8/v2.0",
-          "clientIdSettingName": "AAD_CLIENT_ID",
-          "clientSecretSettingName": "AAD_CLIENT_SECRET"
-        }
-      }
-    }
-  },
   "mimeTypes": {
     ".js": "application/javascript",
     ".css": "text/css",
