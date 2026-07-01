@@ -1,0 +1,23 @@
+{
+  "routes": [
+    {
+      "route": "/images/*",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/*",
+      "rewrite": "/index.html"
+    }
+  ],
+  "mimeTypes": {
+    ".js": "application/javascript",
+    ".css": "text/css",
+    ".json": "application/json",
+    ".ico": "image/x-icon",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".svg": "image/svg+xml"
+  }
+}
