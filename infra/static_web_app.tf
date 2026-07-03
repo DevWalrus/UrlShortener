@@ -8,6 +8,7 @@ resource "azurerm_static_web_app" "creator_ui_stage" {
   app_settings = {
     CREATOR_API_URL = "https://${azurerm_container_app.creator_api_stage.ingress[0].fqdn}"
     MONGODB_URI     = azurerm_cosmosdb_account.main.primary_mongodb_connection_string
+    MONGODB_DB      = "clintendev-stage"
   }
 }
 

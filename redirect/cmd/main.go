@@ -32,7 +32,12 @@ func main() {
 	}
 	defer mongoClient.Disconnect(context.Background())
 
-	store := db.NewLinkStore(mongoClient, "clintendev", "links")
+	dbName := os.Getenv("MONGODB_DB")
+	if dbName == "" {
+		dbName = "clintendev"
+	}
+
+	store := db.NewLinkStore(mongoClient, dbName, "links")
 	linkCache := cache.New(5*time.Minute, 10*time.Minute)
 	h := handler.New(store, linkCache)
 

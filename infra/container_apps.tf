@@ -138,6 +138,11 @@ resource "azurerm_container_app" "creator_api_stage" {
         name        = "MONGODB_URI"
         secret_name = "mongodb-uri"
       }
+
+      env {
+        name  = "MONGODB_DB"
+        value = "clintendev-stage"
+      }
     }
   }
 

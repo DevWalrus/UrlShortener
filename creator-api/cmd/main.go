@@ -32,8 +32,13 @@ func main() {
 	}
 	defer mongoClient.Disconnect(context.Background())
 
-	userStore := db.NewUserStore(mongoClient, "clintendev")
-	linkStore := db.NewLinkStore(mongoClient, "clintendev", "links")
+	dbName := os.Getenv("MONGODB_DB")
+	if dbName == "" {
+		dbName = "clintendev"
+	}
+
+	userStore := db.NewUserStore(mongoClient, dbName)
+	linkStore := db.NewLinkStore(mongoClient, dbName, "links")
 	h := handler.New(linkStore)
 
 	r := chi.NewRouter()
