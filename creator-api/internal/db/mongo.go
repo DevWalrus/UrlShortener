@@ -102,10 +102,10 @@ func (s *LinkStore) Exists(ctx context.Context, slug string) (bool, error) {
 }
 
 type User struct {
-	Email     string    `bson:"email" json:"email"`
-	APIToken  string    `bson:"apiToken" json:"-"` // never serialize token to JSON
-	RevokedAt time.Time `bson:"revokedAt" json:"revokedAt"`
-	CreatedAt time.Time `bson:"createdAt" json:"createdAt"`
+	Email     string     `bson:"email" json:"email"`
+	APIToken  string     `bson:"apiToken" json:"-"` // never serialize token to JSON
+	RevokedAt *time.Time `bson:"revokedAt,omitempty" json:"revokedAt,omitempty"`
+	CreatedAt time.Time  `bson:"createdAt" json:"createdAt"`
 }
 
 type UserStore struct {
