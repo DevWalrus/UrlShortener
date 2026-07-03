@@ -24,17 +24,23 @@ export async function sendRequest(endpoint: string, req: HttpRequest): Promise<H
 
   const body = req.method === 'POST' ? await req.text() : undefined
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    method: req.method,
-    headers,
-    body,
-  })
+  let response: Response
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
+      method: req.method,
+      headers,
+      body,
+    })
+  } catch {
+    return { status: 502, body: 'Bad Gateway' }
+  }
 
+  const contentType = response.headers.get('content-type') ?? 'application/json'
   const hasBody = response.status !== 204 && response.headers.get('content-length') !== '0'
 
   return {
     status: response.status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': contentType },
     body: hasBody ? await response.text() : undefined,
   }
 }
