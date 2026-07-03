@@ -28,7 +28,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: /creator-fe
+          api_location: /creator-fe/api
           output_location: dist
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_API_KEY: ${{ secrets.CREATOR_API_KEY }}

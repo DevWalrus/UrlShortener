@@ -10,12 +10,6 @@ variable "project" {
   default     = "clinten"
 }
 
-variable "creator_api_key" {
-  description = "Shared secret for authenticating requests to the creator API"
-  type        = string
-  sensitive   = true
-}
-
 variable "subscription_id" {
   description = "Azure subscription ID"
   type        = string

@@ -1,9 +1,7 @@
-const BASE = import.meta.env.VITE_API_URL
-const KEY = import.meta.env.VITE_API_KEY
+const BASE = import.meta.env.VITE_API_BASE ?? '/api'
 
 const headers = {
   'Content-Type': 'application/json',
-  'X-API-Key': KEY,
 }
 
 export interface Link {

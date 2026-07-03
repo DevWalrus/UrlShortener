@@ -32,8 +32,9 @@ func main() {
 	}
 	defer mongoClient.Disconnect(context.Background())
 
-	store := db.NewLinkStore(mongoClient, "clintendev", "links")
-	h := handler.New(store)
+	userStore := db.NewUserStore(mongoClient, "clintendev")
+	linkStore := db.NewLinkStore(mongoClient, "clintendev", "links")
+	h := handler.New(linkStore)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -70,7 +71,7 @@ func main() {
 	})
 
 	r.Route("/links", func(r chi.Router) {
-		r.Use(customMiddleware.RequireAPIKey)
+		r.Use(customMiddleware.RequireUserToken(userStore))
 		r.Post("/", h.HandleCreate)
 		r.Get("/", h.HandleList)
 		r.Get("/deleted", h.HandleListDeleted)
