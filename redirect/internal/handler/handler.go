@@ -11,15 +11,28 @@ import (
 	"github.com/DevWalrus/UrlShortener/redirect/internal/cache"
 	"github.com/DevWalrus/UrlShortener/redirect/internal/db"
 	"github.com/go-chi/chi/v5"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Handler struct {
-	store *db.LinkStore
-	cache *cache.Cache
+	store       *db.LinkStore
+	cache       *cache.Cache
+	mongoClient *mongo.Client
 }
 
-func New(store *db.LinkStore, cache *cache.Cache) *Handler {
-	return &Handler{store: store, cache: cache}
+func New(store *db.LinkStore, cache *cache.Cache, mongoClient *mongo.Client) *Handler {
+	return &Handler{store: store, cache: cache, mongoClient: mongoClient}
+}
+
+func (h *Handler) HandleHealth(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+	if err := db.Ping(ctx, h.mongoClient); err != nil {
+		http.Error(w, "mongodb unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
 }
 
 func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {

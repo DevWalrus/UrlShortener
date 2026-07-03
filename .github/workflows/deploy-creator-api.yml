@@ -21,6 +21,7 @@ jobs:
       service_name: creator-api
       container_app_name: clinten-creator-api
       environment: prod
+      health_url: https://clinten-creator-api.wittycoast-2bf013c6.eastus2.azurecontainerapps.io/health
     secrets:
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
