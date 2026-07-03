@@ -7,37 +7,25 @@ import { AuthContext } from '../hooks/useAuth';
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'loading' | 'ok' | 'forbidden'>('loading');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkAuth()
-      .then(() => setStatus('ok'))
-      .catch((e) => {
-        if (e instanceof ForbiddenError) {
-          setStatus('forbidden');
-          navigate('/403');
-        } else {
-          setStatus('ok');
-        }
-      });
+      .catch((e) => { if (e instanceof ForbiddenError) navigate('/403'); })
+      .finally(() => setLoading(false));
   }, [navigate]);
 
   const handleError = useCallback((e: unknown) => {
-    if (e instanceof ForbiddenError) {
-      setStatus('forbidden');
-      navigate('/403');
-    }
+    if (e instanceof ForbiddenError) navigate('/403');
   }, [navigate]);
 
-  if (status === 'loading') {
+  if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
         <CircularProgress />
       </Box>
     );
   }
-
-  if (status === 'forbidden') return null;
 
   return (
     <AuthContext.Provider value={{ handleError }}>
