@@ -19,6 +19,19 @@ output "creator_ui_deployment_token" {
   sensitive = true
 }
 
+output "creator_api_stage_fqdn" {
+  value = azurerm_container_app.creator_api_stage.ingress[0].fqdn
+}
+
+output "creator_ui_stage_hostname" {
+  value = azurerm_static_web_app.creator_ui_stage.default_host_name
+}
+
+output "creator_ui_stage_deployment_token" {
+  value     = azurerm_static_web_app.creator_ui_stage.api_key
+  sensitive = true
+}
+
 output "key_vault_uri" {
   value = azurerm_key_vault.main.vault_uri
 }
