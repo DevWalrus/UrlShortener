@@ -40,6 +40,10 @@ func NewLinkStore(client *mongo.Client, dbName, collectionName string) *LinkStor
 	}
 }
 
+func Ping(ctx context.Context, client *mongo.Client) error {
+	return client.Ping(ctx, nil)
+}
+
 var ErrSlugExists = errors.New("slug already exists")
 
 func (s *LinkStore) Create(ctx context.Context, link *Link) error {

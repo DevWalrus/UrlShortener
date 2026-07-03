@@ -39,16 +39,13 @@ func main() {
 
 	store := db.NewLinkStore(mongoClient, dbName, "links")
 	linkCache := cache.New(5*time.Minute, 10*time.Minute)
-	h := handler.New(store, linkCache)
+	h := handler.New(store, linkCache, mongoClient)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
-	})
+	r.Get("/health", h.HandleHealth)
 
 	r.Get("/{slug}", h.HandleRedirect)
 

@@ -22,6 +22,7 @@ jobs:
       container_app_name: clinten-creator-api-stage
       image_tag: stage
       environment: stage
+      health_url: https://clinten-creator-api-stage.wittycoast-2bf013c6.eastus2.azurecontainerapps.io/health
     secrets:
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}

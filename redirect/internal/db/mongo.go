@@ -37,6 +37,10 @@ func NewLinkStore(client *mongo.Client, dbName, collectionName string) *LinkStor
 	}
 }
 
+func Ping(ctx context.Context, client *mongo.Client) error {
+	return client.Ping(ctx, nil)
+}
+
 func (s *LinkStore) FindBySlug(ctx context.Context, slug string) (*Link, error) {
 	slug = strings.ToUpper(slug)
 

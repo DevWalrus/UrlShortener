@@ -10,14 +10,27 @@ import (
 	"github.com/DevWalrus/UrlShortener/creator-api/internal/db"
 	"github.com/DevWalrus/UrlShortener/creator-api/internal/slug"
 	"github.com/go-chi/chi/v5"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Handler struct {
-	store *db.LinkStore
+	store       *db.LinkStore
+	mongoClient *mongo.Client
 }
 
-func New(store *db.LinkStore) *Handler {
-	return &Handler{store: store}
+func New(store *db.LinkStore, mongoClient *mongo.Client) *Handler {
+	return &Handler{store: store, mongoClient: mongoClient}
+}
+
+func (h *Handler) HandleHealth(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+	if err := db.Ping(ctx, h.mongoClient); err != nil {
+		http.Error(w, "mongodb unavailable", http.StatusServiceUnavailable)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
 }
 
 type createRequest struct {
