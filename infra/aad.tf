@@ -8,11 +8,19 @@ resource "azuread_service_principal" "github_actions" {
   client_id = azuread_application.github_actions.client_id
 }
 
-resource "azuread_application_federated_identity_credential" "github_actions" {
+resource "azuread_application_federated_identity_credential" "github_actions_prod" {
   application_id = azuread_application.github_actions.id
-  display_name   = "github-actions"
+  display_name   = "github-actions-prod"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:DevWalrus/UrlShortener:ref:refs/heads/main"
+  subject        = "repo:DevWalrus/UrlShortener:environment:prod"
+  audiences      = ["api://AzureADTokenExchange"]
+}
+
+resource "azuread_application_federated_identity_credential" "github_actions_stage" {
+  application_id = azuread_application.github_actions.id
+  display_name   = "github-actions-stage"
+  issuer         = "https://token.actions.githubusercontent.com"
+  subject        = "repo:DevWalrus/UrlShortener:environment:stage"
   audiences      = ["api://AzureADTokenExchange"]
 }
 
