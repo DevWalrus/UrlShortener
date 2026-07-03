@@ -28,6 +28,12 @@ resource "azurerm_cosmosdb_mongo_database" "main" {
   account_name        = azurerm_cosmosdb_account.main.name
 }
 
+resource "azurerm_cosmosdb_mongo_database" "stage" {
+  name                = "clintendev-stage"
+  resource_group_name = azurerm_resource_group.main.name
+  account_name        = azurerm_cosmosdb_account.main.name
+}
+
 resource "azurerm_cosmosdb_mongo_collection" "links" {
   name                = "links"
   resource_group_name = azurerm_resource_group.main.name
@@ -50,6 +56,45 @@ resource "azurerm_cosmosdb_mongo_collection" "users" {
   resource_group_name = azurerm_resource_group.main.name
   account_name        = azurerm_cosmosdb_account.main.name
   database_name       = azurerm_cosmosdb_mongo_database.main.name
+
+  index {
+    keys   = ["email"]
+    unique = true
+  }
+
+  index {
+    keys   = ["apiToken"]
+    unique = true
+  }
+
+  index {
+    keys = ["_id"]
+    unique = true
+  }
+}
+
+resource "azurerm_cosmosdb_mongo_collection" "links_stage" {
+  name                = "links"
+  resource_group_name = azurerm_resource_group.main.name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_mongo_database.stage.name
+
+  index {
+    keys   = ["slug"]
+    unique = true
+  }
+
+  index {
+    keys = ["_id"]
+    unique = true
+  }
+}
+
+resource "azurerm_cosmosdb_mongo_collection" "users_stage" {
+  name                = "users"
+  resource_group_name = azurerm_resource_group.main.name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_mongo_database.stage.name
 
   index {
     keys   = ["email"]
