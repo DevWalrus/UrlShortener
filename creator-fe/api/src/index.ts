@@ -1,9 +1,9 @@
-import { app } from '@azure/functions'
+import { app } from '@azure/functions';
 
-import './functions/links'
-import './functions/linksDeleted'
-import './functions/linksSlug'
+import './functions/links';
+import './functions/linksDeleted';
+import './functions/linksSlug';
 
 app.setup({
   enableHttpStream: true,
-})
+});

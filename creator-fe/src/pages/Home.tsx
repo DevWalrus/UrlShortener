@@ -1,7 +1,7 @@
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
-import { Link } from 'react-router-dom'
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
@@ -21,5 +21,5 @@ export default function Home() {
         </Button>
       </Box>
     </Box>
-  )
+  );
 }
