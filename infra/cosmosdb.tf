@@ -44,3 +44,25 @@ resource "azurerm_cosmosdb_mongo_collection" "links" {
     unique = true
   }
 }
+
+resource "azurerm_cosmosdb_mongo_collection" "users" {
+  name                = "users"
+  resource_group_name = azurerm_resource_group.main.name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_mongo_database.main.name
+
+  index {
+    keys   = ["email"]
+    unique = true
+  }
+
+  index {
+    keys   = ["apiToken"]
+    unique = true
+  }
+
+  index {
+    keys = ["_id"]
+    unique = true
+  }
+}

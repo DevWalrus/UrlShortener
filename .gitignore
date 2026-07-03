@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/terraform,go,react,angular
-# Edit at https://www.toptal.com/developers/gitignore?templates=terraform,go,react,angular
+# Created by https://www.toptal.com/developers/gitignore/api/terraform,go,react,angular,azurefunctions
+# Edit at https://www.toptal.com/developers/gitignore?templates=terraform,go,react,angular,azurefunctions
 
 ### Angular ###
 ## Angular ##
@@ -32,6 +32,10 @@ e2e/*.map
 
 # System Files
 .DS_Store/
+
+### AzureFunctions ###
+# Azure Functions localsettings file
+local.settings.json
 
 ### Go ###
 # If you prefer the allow list template instead of the deny list, see community template:
@@ -108,6 +112,6 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# End of https://www.toptal.com/developers/gitignore/api/terraform,go,react,angular
+# End of https://www.toptal.com/developers/gitignore/api/terraform,go,react,angular,azurefunctions
 
 *.local

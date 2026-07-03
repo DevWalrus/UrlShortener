@@ -124,11 +124,6 @@ resource "azurerm_container_app" "creator_api" {
         name        = "MONGODB_URI"
         secret_name = "mongodb-uri"
       }
-
-      env {
-        name        = "API_KEY"
-        secret_name = "creator-api-key"
-      }
     }
   }
 
@@ -141,12 +136,6 @@ resource "azurerm_container_app" "creator_api" {
   secret {
     name                = "registry-password"
     key_vault_secret_id = azurerm_key_vault_secret.registry_password.id
-    identity            = azurerm_user_assigned_identity.creator_api.id
-  }
-
-  secret {
-    name                = "creator-api-key"
-    key_vault_secret_id = azurerm_key_vault_secret.creator_api_key.id
     identity            = azurerm_user_assigned_identity.creator_api.id
   }
 

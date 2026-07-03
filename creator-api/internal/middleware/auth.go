@@ -1,21 +1,47 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
-	"os"
+	"time"
+
+	"github.com/DevWalrus/UrlShortener/creator-api/internal/db"
 )
 
-func RequireAPIKey(next http.Handler) http.Handler {
-	expectedKey := os.Getenv("API_KEY")
+type contextKey string
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		providedKey := r.Header.Get("X-API-Key")
+const UserContextKey contextKey = "user"
 
-		if expectedKey == "" || providedKey != expectedKey {
-			http.Error(w, "unauthorized", http.StatusUnauthorized)
-			return
-		}
+func RequireUserToken(store *db.UserStore) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			token := r.Header.Get("X-API-Key")
+			if token == "" {
+				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				return
+			}
 
-		next.ServeHTTP(w, r)
-	})
+			ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+			defer cancel()
+
+			user, err := store.FindByToken(ctx, token)
+			if err != nil {
+				http.Error(w, "internal server error", http.StatusInternalServerError)
+				return
+			}
+			if user == nil {
+				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Attach user to context so handlers can access it for logging later
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserContextKey, user)))
+		})
+	}
+}
+
+// Helper to pull user out of context in handlers
+func UserFromContext(ctx context.Context) *db.User {
+	user, _ := ctx.Value(UserContextKey).(*db.User)
+	return user
 }
