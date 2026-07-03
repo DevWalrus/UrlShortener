@@ -4,6 +4,10 @@ import { getUserFromRequest } from './auth'
 const API_URL = process.env.CREATOR_API_URL
 
 export async function sendRequest(endpoint: string, req: HttpRequest): Promise<HttpResponseInit> {
+  if (!API_URL) {
+    return { status: 500, body: 'Server misconfigured: CREATOR_API_URL is not set.' }
+  }
+
   const user = await getUserFromRequest(req)
 
   if (!user) {
