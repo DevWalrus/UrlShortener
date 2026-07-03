@@ -39,7 +39,7 @@ func main() {
 
 	userStore := db.NewUserStore(mongoClient, dbName)
 	linkStore := db.NewLinkStore(mongoClient, dbName, "links")
-	h := handler.New(linkStore)
+	h := handler.New(linkStore, mongoClient)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -70,10 +70,7 @@ func main() {
 		})
 	})
 
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
-	})
+	r.Get("/health", h.HandleHealth)
 
 	r.Route("/links", func(r chi.Router) {
 		r.Use(customMiddleware.RequireUserToken(userStore))

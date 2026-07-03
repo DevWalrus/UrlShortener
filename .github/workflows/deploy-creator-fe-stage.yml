@@ -19,5 +19,6 @@ jobs:
     uses: ./.github/workflows/deploy-fe-template.yml
     with:
       environment: stage
+      health_url: https://red-desert-04141eb0f.7.azurestaticapps.net/api/health
     secrets:
       SWA_DEPLOYMENT_TOKEN: ${{ secrets.SWA_DEPLOYMENT_TOKEN }}

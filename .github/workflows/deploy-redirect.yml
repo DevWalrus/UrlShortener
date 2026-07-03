@@ -21,6 +21,7 @@ jobs:
       service_name: redirect
       container_app_name: clinten-redirect
       environment: prod
+      health_url: https://clinten-redirect.wittycoast-2bf013c6.eastus2.azurecontainerapps.io/health
     secrets:
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
