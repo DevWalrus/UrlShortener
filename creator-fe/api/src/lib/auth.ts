@@ -1,24 +1,34 @@
-import { HttpRequest } from '@azure/functions'
-import { getDb } from './db'
+import { HttpRequest } from '@azure/functions';
+import { getDb } from './db';
 
-export async function getUserFromRequest(req: HttpRequest) {
-  const principalHeader = req.headers.get('x-ms-client-principal')
-  if (!principalHeader) return null
+export type UserRecord = {
+  apiToken?: string;
+  email?: string;
+  revokedAt?: unknown;
+};
 
-  let principal: any
+type ClientPrincipal = {
+  userDetails?: unknown;
+};
+
+export async function getUserFromRequest(req: HttpRequest): Promise<UserRecord | null> {
+  const principalHeader = req.headers.get('x-ms-client-principal');
+  if (!principalHeader) return null;
+
+  let principal: ClientPrincipal;
   try {
-    principal = JSON.parse(Buffer.from(principalHeader, 'base64').toString('utf8'))
+    principal = JSON.parse(Buffer.from(principalHeader, 'base64').toString('utf8')) as ClientPrincipal;
   } catch {
-    return null
+    return null;
   }
 
-  const email: string | undefined = principal?.userDetails
-  if (!email) return null
-  const db = await getDb()
-  const user = await db.collection('users').findOne({
+  const email = typeof principal.userDetails === 'string' ? principal.userDetails : undefined;
+  if (!email) return null;
+  const db = await getDb();
+  const user = await db.collection<UserRecord>('users').findOne({
     email,
     revokedAt: { $exists: false },
-  })
+  });
 
-  return user ?? null
+  return user ?? null;
 }

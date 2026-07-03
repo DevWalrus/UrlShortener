@@ -1,11 +1,11 @@
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
-import { Link, useSearchParams } from 'react-router-dom'
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { Link, useSearchParams } from 'react-router-dom';
 
 export default function NotFound() {
-  const [params] = useSearchParams()
-  const slug = params.get('slug')
+  const [params] = useSearchParams();
+  const slug = params.get('slug');
 
   return (
     <Box sx={{ textAlign: 'center', mt: 8 }}>
@@ -24,5 +24,5 @@ export default function NotFound() {
         Create a New Link
       </Button>
     </Box>
-  )
+  );
 }
