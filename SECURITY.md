@@ -17,6 +17,10 @@ Send a private report instead and include:
 - Store production secrets in Azure Key Vault or the equivalent deployment secret store.
 - Do not expose credentials to the browser unless they are intentionally public and non-sensitive.
 
+## Known limitations
+
+- API tokens are stored in plaintext in MongoDB. If the database is breached, tokens could be used to make requests to the backend API on behalf of users. Mitigated by: tokens are not user-facing or user-manageable, the database connection string is stored in Azure Key Vault, and tokens can be rotated server-side at any time.
+
 ## Public releases
 
 Before making this repository public, verify that:
