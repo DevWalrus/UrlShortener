@@ -46,6 +46,11 @@ resource "azurerm_cosmosdb_mongo_collection" "links" {
   }
 
   index {
+    keys = ["createdAt"]
+    unique = false
+  }
+
+  index {
     keys = ["_id"]
     unique = true
   }
@@ -82,6 +87,11 @@ resource "azurerm_cosmosdb_mongo_collection" "links_stage" {
   index {
     keys   = ["slug"]
     unique = true
+  }
+
+  index {
+    keys = ["createdAt"]
+    unique = false
   }
 
   index {
