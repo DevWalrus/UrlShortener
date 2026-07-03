@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box';
+﻿import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import FormControl from '@mui/material/FormControl';
@@ -12,8 +12,10 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { createLink, type Link } from '../api/links';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Create() {
+  const { handleError } = useAuth();
   const [destination, setDestination] = useState('');
   const [customSlug, setCustomSlug] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,7 @@ export default function Create() {
       setDestination('');
       setCustomSlug('');
     } catch (err: any) {
+      handleError(err);
       toast.error(err.message || 'Something went wrong');
     } finally {
       setLoading(false);
