@@ -22,7 +22,7 @@ export interface CreateLinkRequest {
 
 
 export async function checkAuth(): Promise<void> {
-  const res = await fetch(`/auth`, { headers });
+  const res = await fetch(`${BASE}/auth`, { headers });
   if (res.status === 403) throw new ForbiddenError();
   if (!res.ok) throw new Error('Auth check failed');
 }
