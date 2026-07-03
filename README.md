@@ -186,7 +186,6 @@ The performance-critical path. Every click on a short URL hits this service.
 |---|---|
 | `MONGODB_URI` | Cosmos DB connection string |
 | `PORT` | HTTP port (default: `8080`) |
-| `NOT_FOUND_URL` | Where to redirect unknown slugs (default: `https://create.clinten.dev/404`) |
 
 ---
 
@@ -367,7 +366,6 @@ Create `/redirect/.env.local`:
 ```
 MONGODB_URI=<connection-string>
 PORT=4200
-NOT_FOUND_URL=http://localhost:5173/404
 ```
 
 ```bash
