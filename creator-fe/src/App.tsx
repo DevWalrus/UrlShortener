@@ -1,10 +1,10 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { Toaster } from 'sonner'
-import Layout from './components/Layout'
-import Create from './pages/Create'
-import Home from './pages/Home'
-import List from './pages/List'
-import NotFound from './pages/NotFound'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import Layout from './components/Layout';
+import Create from './pages/Create';
+import Home from './pages/Home';
+import List from './pages/List';
+import NotFound from './pages/NotFound';
 
 const router = createBrowserRouter([
   {
@@ -18,7 +18,7 @@ const router = createBrowserRouter([
       { path: '*', element: <NotFound /> },
     ],
   },
-])
+]);
 
 export default function App() {
   return (
@@ -26,5 +26,5 @@ export default function App() {
       <RouterProvider router={router} />
       <Toaster position="bottom-right" richColors />
     </>
-  )
+  );
 }

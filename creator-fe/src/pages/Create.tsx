@@ -1,50 +1,50 @@
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-import FormControl from '@mui/material/FormControl'
-import IconButton from '@mui/material/IconButton'
-import InputAdornment from '@mui/material/InputAdornment'
-import OutlinedInput from '@mui/material/OutlinedInput'
-import Paper from '@mui/material/Paper'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { createLink, type Link } from '../api/links'
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import FormControl from '@mui/material/FormControl';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { createLink, type Link } from '../api/links';
 
 export default function Create() {
-  const [destination, setDestination] = useState('')
-  const [customSlug, setCustomSlug] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<Link | null>(null)
+  const [destination, setDestination] = useState('');
+  const [customSlug, setCustomSlug] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<Link | null>(null);
 
-  const shortUrl = result ? `https://clinten.dev/${result.slug}` : ''
+  const shortUrl = result ? `https://clinten.dev/${result.slug}` : '';
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setResult(null)
+    e.preventDefault();
+    setLoading(true);
+    setResult(null);
 
     try {
       const link = await createLink({
         destination,
         customSlug: customSlug || undefined,
-      })
-      setResult(link)
-      toast.success('Short link created!')
-      setDestination('')
-      setCustomSlug('')
+      });
+      setResult(link);
+      toast.success('Short link created!');
+      setDestination('');
+      setCustomSlug('');
     } catch (err: any) {
-      toast.error(err.message || 'Something went wrong')
+      toast.error(err.message || 'Something went wrong');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   function handleCopy() {
-    navigator.clipboard.writeText(shortUrl)
-    toast.success('Copied to clipboard!')
+    navigator.clipboard.writeText(shortUrl);
+    toast.success('Copied to clipboard!');
   }
 
   return (
@@ -72,8 +72,8 @@ export default function Create() {
               const clean = e.target.value
                 .toUpperCase()
                 .replace(/[^A-Z0-9]/g, '')
-                .slice(0, 7)
-              setCustomSlug(clean)
+                .slice(0, 7);
+              setCustomSlug(clean);
             }}
             fullWidth
             helperText="Up to 7 characters, letters and numbers only. Leave blank to auto-generate."
@@ -118,5 +118,5 @@ export default function Create() {
         </Paper>
       )}
     </Box>
-  )
+  );
 }

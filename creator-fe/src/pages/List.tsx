@@ -1,57 +1,69 @@
-import DeleteIcon from '@mui/icons-material/Delete'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
-import CircularProgress from '@mui/material/CircularProgress'
-import IconButton from '@mui/material/IconButton'
-import Tab from '@mui/material/Tab'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import Tabs from '@mui/material/Tabs'
-import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { deleteLink, listDeletedLinks, listLinks, type Link } from '../api/links'
-import ConfirmDialog from '../components/ConfirmDialog'
+import DeleteIcon from '@mui/icons-material/Delete';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import Tab from '@mui/material/Tab';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Tabs from '@mui/material/Tabs';
+import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { deleteLink, listDeletedLinks, listLinks, type Link } from '../api/links';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function List() {
-  const [tab, setTab] = useState(0)
-  const [active, setActive] = useState<Link[]>([])
-  const [deleted, setDeleted] = useState<Link[]>([])
-  const [loading, setLoading] = useState(true)
-  const [confirmSlug, setConfirmSlug] = useState<string | null>(null)
+  const [tab, setTab] = useState(0);
+  const [active, setActive] = useState<Link[]>([]);
+  const [deleted, setDeleted] = useState<Link[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
 
   async function loadLinks() {
-    setLoading(true)
     try {
-      const [a, d] = await Promise.all([listLinks(), listDeletedLinks()])
-      setActive(a)
-      setDeleted(d)
+      const [a, d] = await Promise.all([listLinks(), listDeletedLinks()]);
+      setActive(a);
+      setDeleted(d);
     } catch {
-      toast.error('Failed to load links')
+      toast.error('Failed to load links');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadLinks()
-  }, [])
+    let cancelled = false;
+    async function load() {
+      try {
+        const [a, d] = await Promise.all([listLinks(), listDeletedLinks()]);
+        if (!cancelled) { setActive(a); setDeleted(d); }
+      } catch {
+        if (!cancelled) toast.error('Failed to load links');
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
   async function handleDelete() {
-    if (!confirmSlug) return
+    if (!confirmSlug) return;
+    setLoading(true);
     try {
-      await deleteLink(confirmSlug)
-      toast.success(`${confirmSlug} deleted`)
-      await loadLinks()
+      await deleteLink(confirmSlug);
+      toast.success(`${confirmSlug} deleted`);
+      await loadLinks();
     } catch {
-      toast.error('Failed to delete link')
+      toast.error('Failed to delete link');
     } finally {
-      setConfirmSlug(null)
+      setConfirmSlug(null);
     }
   }
 
@@ -60,7 +72,7 @@ export default function List() {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
-    })
+    });
   }
 
   if (loading) {
@@ -68,7 +80,7 @@ export default function List() {
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
   return (
@@ -188,5 +200,5 @@ export default function List() {
         onCancel={() => setConfirmSlug(null)}
       />
     </Box>
-  )
+  );
 }
