@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -14,17 +14,12 @@ import (
 )
 
 type Handler struct {
-	store       *db.LinkStore
-	cache       *cache.Cache
-	notFoundURL string
+	store *db.LinkStore
+	cache *cache.Cache
 }
 
 func New(store *db.LinkStore, cache *cache.Cache) *Handler {
-	notFoundURL := os.Getenv("NOT_FOUND_URL")
-	if notFoundURL == "" {
-		notFoundURL = "https://create.clinten.dev/404"
-	}
-	return &Handler{store: store, cache: cache, notFoundURL: notFoundURL}
+	return &Handler{store: store, cache: cache}
 }
 
 func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
@@ -65,5 +60,26 @@ func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) renderNotFound(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, h.notFoundURL+"?slug="+chi.URLParam(r, "slug"), http.StatusFound)
+	slug := chi.URLParam(r, "slug")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprintf(w, `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 – Link Not Found</title>
+  <style>
+    body { font-family: system-ui, sans-serif; text-align: center; padding: 4rem 1rem; color: #333; }
+    h1 { font-size: 6rem; font-weight: 700; color: #999; margin: 0; }
+    h2 { font-size: 1.5rem; margin: 0.5rem 0 1rem; }
+    p { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>404</h1>
+  <h2>Link not found</h2>
+  <p>The link <strong>%s</strong> doesn't exist or has been deleted.</p>
+</body>
+</html>`, slug)
 }
