@@ -84,7 +84,7 @@ jobs:
             az containerapp update \
               --name ${{ inputs.container_app_name }} \
               --resource-group rg-clinten \
-              --image clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ github.sha }}
+              --image clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:latest
 
       - name: Deploy to Container App (stage)
         if: inputs.image_tag != 'latest'
