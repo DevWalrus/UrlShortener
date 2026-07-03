@@ -49,14 +49,24 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and push image
+      - name: Build and push image (prod)
+        if: inputs.image_tag == 'latest'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ inputs.service_name }}
+          push: true
+          tags: |
+            clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:latest
+            clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ github.sha }}
+
+      - name: Build and push image (stage)
+        if: inputs.image_tag != 'latest'
         uses: docker/build-push-action@v5
         with:
           context: ./${{ inputs.service_name }}
           push: true
           tags: |
             clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ inputs.image_tag }}
-            clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ github.sha }}-${{ inputs.image_tag }}
 
       - name: Log in to Azure
         uses: azure/login@v2
@@ -65,7 +75,8 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Container App
+      - name: Deploy to Container App (prod)
+        if: inputs.image_tag == 'latest'
         uses: azure/cli@v2
         with:
           azcliversion: latest
@@ -73,4 +84,15 @@ jobs:
             az containerapp update \
               --name ${{ inputs.container_app_name }} \
               --resource-group rg-clinten \
-              --image clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ github.sha }}-${{ inputs.image_tag }}
+              --image clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ github.sha }}
+
+      - name: Deploy to Container App (stage)
+        if: inputs.image_tag != 'latest'
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az containerapp update \
+              --name ${{ inputs.container_app_name }} \
+              --resource-group rg-clinten \
+              --image clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ inputs.image_tag }}
