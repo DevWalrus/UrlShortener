@@ -1,4 +1,4 @@
-import DeleteIcon from '@mui/icons-material/Delete';
+﻿import DeleteIcon from '@mui/icons-material/Delete';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -16,9 +16,11 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { deleteLink, listDeletedLinks, listLinks, type Link } from '../api/links';
+import { useAuth } from '../hooks/useAuth';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function List() {
+  const { handleError } = useAuth();
   const [tab, setTab] = useState(0);
   const [active, setActive] = useState<Link[]>([]);
   const [deleted, setDeleted] = useState<Link[]>([]);
@@ -43,15 +45,15 @@ export default function List() {
       try {
         const [a, d] = await Promise.all([listLinks(), listDeletedLinks()]);
         if (!cancelled) { setActive(a); setDeleted(d); }
-      } catch {
-        if (!cancelled) toast.error('Failed to load links');
+      } catch (e) {
+        if (!cancelled) { handleError(e); toast.error('Failed to load links'); }
       } finally {
         setLoading(false);
       }
     }
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [handleError]);
 
   async function handleDelete() {
     if (!confirmSlug) return;
@@ -60,7 +62,8 @@ export default function List() {
       await deleteLink(confirmSlug);
       toast.success(`${confirmSlug} deleted`);
       await loadLinks();
-    } catch {
+    } catch (e) {
+      handleError(e);
       toast.error('Failed to delete link');
     } finally {
       setConfirmSlug(null);
@@ -185,7 +188,7 @@ export default function List() {
                 </TableCell>
                 <TableCell align="center">{link.hitCount}</TableCell>
                 <TableCell>{formatDate(link.createdAt)}</TableCell>
-                <TableCell>{link.deletedAt ? formatDate(link.deletedAt) : '—'}</TableCell>
+                <TableCell>{link.deletedAt ? formatDate(link.deletedAt) : 'â€”'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
