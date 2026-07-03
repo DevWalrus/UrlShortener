@@ -17,9 +17,17 @@ export async function sendRequest(endpoint: string, req: HttpRequest): Promise<H
     }
   }
 
+  const apiToken = (user as any)?.apiToken
+  if (typeof apiToken !== 'string' || apiToken.length === 0) {
+    return {
+      status: 403,
+      body: 'Forbidden — you do not have access to this resource.',
+    }
+  }
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'X-API-Key': user.apiToken as string,
+    'X-API-Key': apiToken,
   }
 
   const body = req.method === 'POST' ? await req.text() : undefined
