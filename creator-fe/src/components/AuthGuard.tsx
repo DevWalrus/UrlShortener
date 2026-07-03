@@ -8,15 +8,24 @@ import { AuthContext } from '../hooks/useAuth';
 export function AuthGuard({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {
     checkAuth()
-      .catch((e) => { if (e instanceof ForbiddenError) navigate('/403'); })
+      .catch((e) => {
+        if (e instanceof ForbiddenError) {
+          setForbidden(true);
+          navigate('/403');
+        }
+      })
       .finally(() => setLoading(false));
   }, [navigate]);
 
   const handleError = useCallback((e: unknown) => {
-    if (e instanceof ForbiddenError) navigate('/403');
+    if (e instanceof ForbiddenError) {
+      setForbidden(true);
+      navigate('/403');
+    }
   }, [navigate]);
 
   if (loading) {
@@ -28,7 +37,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ handleError }}>
+    <AuthContext.Provider value={{ forbidden, handleError }}>
       {children}
     </AuthContext.Provider>
   );
