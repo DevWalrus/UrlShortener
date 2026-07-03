@@ -11,6 +11,16 @@ on:
         required: true
         type: string
         description: "Azure Container App resource name"
+      image_tag:
+        required: false
+        type: string
+        default: "latest"
+        description: "Docker image tag to push and deploy (e.g. 'latest' or 'stage')"
+      environment:
+        required: false
+        type: string
+        default: "prod"
+        description: "GitHub environment to deploy to"
     secrets:
       ACR_USERNAME:
         required: true
@@ -26,6 +36,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: Checkout
@@ -38,7 +49,8 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and push image
+      - name: Build and push image (prod)
+        if: inputs.image_tag == 'latest'
         uses: docker/build-push-action@v5
         with:
           context: ./${{ inputs.service_name }}
@@ -47,6 +59,15 @@ jobs:
             clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:latest
             clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ github.sha }}
 
+      - name: Build and push image (stage)
+        if: inputs.image_tag != 'latest'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ inputs.service_name }}
+          push: true
+          tags: |
+            clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ inputs.image_tag }}
+
       - name: Log in to Azure
         uses: azure/login@v2
         with:
@@ -54,7 +75,8 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Container App
+      - name: Deploy to Container App (prod)
+        if: inputs.image_tag == 'latest'
         uses: azure/cli@v2
         with:
           azcliversion: latest
@@ -63,3 +85,14 @@ jobs:
               --name ${{ inputs.container_app_name }} \
               --resource-group rg-clinten \
               --image clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ github.sha }}
+
+      - name: Deploy to Container App (stage)
+        if: inputs.image_tag != 'latest'
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            az containerapp update \
+              --name ${{ inputs.container_app_name }} \
+              --resource-group rg-clinten \
+              --image clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ inputs.image_tag }}

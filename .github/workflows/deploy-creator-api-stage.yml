@@ -1,12 +1,12 @@
-name: Deploy Redirect Service
+name: Deploy Creator API (Stage)
 
 on:
   push:
     branches:
-      - main
+      - dev
     paths:
-      - 'redirect/**'
-      - '.github/workflows/deploy-redirect.yml'
+      - 'creator-api/**'
+      - '.github/workflows/deploy-creator-api-stage.yml'
       - '.github/workflows/deploy-template.yml'
   workflow_dispatch:
 
@@ -18,9 +18,10 @@ jobs:
   deploy:
     uses: ./.github/workflows/deploy-template.yml
     with:
-      service_name: redirect
-      container_app_name: clinten-redirect
-      environment: prod
+      service_name: creator-api
+      container_app_name: clinten-creator-api-stage
+      image_tag: stage
+      environment: stage
     secrets:
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
