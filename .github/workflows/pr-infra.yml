@@ -1,0 +1,50 @@
+name: PR Checks - Infra
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'infra/**'
+      - '.github/workflows/pr-infra.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'infra/**'
+      - '.github/workflows/pr-infra.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+        working-directory: infra
+
+      - name: Init (no backend)
+        run: terraform init -backend=false
+        working-directory: infra
+
+      - name: Validate
+        run: terraform validate
+        working-directory: infra
+
+  scan:
+    name: Trivy IaC Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Scan Terraform config
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: infra/
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
