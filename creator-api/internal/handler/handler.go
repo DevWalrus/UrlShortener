@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -53,6 +54,11 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 
 	if req.Destination == "" {
 		http.Error(w, "destination is required", http.StatusBadRequest)
+		return
+	}
+
+	if parsed, err := url.Parse(req.Destination); err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") {
+		http.Error(w, "destination must be a valid http or https URL", http.StatusBadRequest)
 		return
 	}
 
