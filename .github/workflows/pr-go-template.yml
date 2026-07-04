@@ -1,0 +1,60 @@
+name: PR Checks - Go Template
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        required: true
+        type: string
+        description: "Service directory name (e.g. 'redirect' or 'creator-api')"
+      exclude_packages:
+        required: false
+        type: string
+        default: "/db|/cmd"
+        description: "grep -Ev regex of packages to exclude from testing (e.g. '/db|/cmd'). All other packages are tested automatically."
+      coverage_threshold:
+        required: false
+        type: number
+        default: 90
+        description: "Minimum acceptable coverage percentage"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ inputs.service }}/go.mod
+          cache-dependency-path: ${{ inputs.service }}/go.sum
+
+      - name: Vet
+        run: go vet ./...
+        working-directory: ${{ inputs.service }}
+
+  test:
+    name: Test (coverage ≥ ${{ inputs.coverage_threshold }}%)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ inputs.service }}/go.mod
+          cache-dependency-path: ${{ inputs.service }}/go.sum
+
+      - name: Run tests with coverage
+        run: |
+          PACKAGES=$(go list ./... | grep -Ev '${{ inputs.exclude_packages }}')
+          go test -coverprofile=coverage.out $PACKAGES
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "Coverage: ${COVERAGE}%"
+          if [ "$(echo "$COVERAGE < ${{ inputs.coverage_threshold }}" | bc -l)" -eq 1 ]; then
+            echo "ERROR: Coverage ${COVERAGE}% is below the ${{ inputs.coverage_threshold }}% threshold"
+            exit 1
+          fi
+        working-directory: ${{ inputs.service }}

@@ -39,7 +39,9 @@ func main() {
 
 	userStore := db.NewUserStore(mongoClient, dbName)
 	linkStore := db.NewLinkStore(mongoClient, dbName, "links")
-	h := handler.New(linkStore, mongoClient)
+	h := handler.New(linkStore, func(ctx context.Context) error {
+		return db.Ping(ctx, mongoClient)
+	})
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)

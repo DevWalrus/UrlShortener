@@ -39,7 +39,9 @@ func main() {
 
 	store := db.NewLinkStore(mongoClient, dbName, "links")
 	linkCache := cache.New(5*time.Minute, 10*time.Minute)
-	h := handler.New(store, linkCache, mongoClient)
+	h := handler.New(store, linkCache, func(ctx context.Context) error {
+		return db.Ping(ctx, mongoClient)
+	})
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
