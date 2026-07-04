@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -73,7 +74,7 @@ func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) renderNotFound(w http.ResponseWriter, r *http.Request) {
-	slug := chi.URLParam(r, "slug")
+	slug := html.EscapeString(chi.URLParam(r, "slug"))
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusNotFound)
 	fmt.Fprintf(w, `<!doctype html>
