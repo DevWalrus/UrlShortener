@@ -20,6 +20,16 @@ updates:
     schedule:
       interval: weekly
 
+  - package-ecosystem: docker
+    directory: /redirect
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: docker
+    directory: /creator-api
+    schedule:
+      interval: weekly
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
