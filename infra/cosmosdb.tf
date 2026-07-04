@@ -46,12 +46,12 @@ resource "azurerm_cosmosdb_mongo_collection" "links" {
   }
 
   index {
-    keys = ["createdAt"]
+    keys   = ["createdAt"]
     unique = false
   }
 
   index {
-    keys = ["_id"]
+    keys   = ["_id"]
     unique = true
   }
 }
@@ -73,7 +73,7 @@ resource "azurerm_cosmosdb_mongo_collection" "users" {
   }
 
   index {
-    keys = ["_id"]
+    keys   = ["_id"]
     unique = true
   }
 }
@@ -90,12 +90,12 @@ resource "azurerm_cosmosdb_mongo_collection" "links_stage" {
   }
 
   index {
-    keys = ["createdAt"]
+    keys   = ["createdAt"]
     unique = false
   }
 
   index {
-    keys = ["_id"]
+    keys   = ["_id"]
     unique = true
   }
 }
@@ -117,7 +117,7 @@ resource "azurerm_cosmosdb_mongo_collection" "users_stage" {
   }
 
   index {
-    keys = ["_id"]
+    keys   = ["_id"]
     unique = true
   }
 }
