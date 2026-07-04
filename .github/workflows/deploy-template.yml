@@ -72,6 +72,15 @@ jobs:
           tags: |
             clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ inputs.image_tag }}
 
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: clintenregistry.azurecr.io/clinten-${{ inputs.service_name }}:${{ inputs.image_tag }}
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+
       - name: Log in to Azure
         uses: azure/login@v2
         with:

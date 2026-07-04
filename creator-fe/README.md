@@ -1,75 +1,64 @@
-# React + TypeScript + Vite
+# creator-fe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The management UI for clinten.dev, deployed to Azure Static Web Apps at `create.clinten.dev`. Built with React + Vite + TypeScript + MUI.
 
-Currently, two official plugins are available:
+## How it works
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Azure Static Web Apps enforces AAD authentication at the edge — unauthenticated visitors are redirected to Microsoft login before any content is served. `staticwebapp.config.json` controls routing and which paths are publicly accessible.
 
-## React Compiler
+On load, `AuthGuard` (wrapping the entire app) calls `/api/auth` to verify the logged-in user exists in the MongoDB `users` collection. If the user is not provisioned, a `403` is returned and the app navigates to the `/403` page and hides all nav links. This check is separate from Azure SSO — AAD authenticates identity, the `users` collection controls access.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+API calls go to `/api/*` (same origin), which is handled by the Azure Functions auth proxy in [`creator-fe/api/`](api/README.md).
 
-## Expanding the ESLint configuration
+## Local development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**Prerequisites:** Node.js 22+
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The auth proxy (`creator-fe/api/`) must also be running locally — see its README.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+Create `.env.local`:
+```
+VITE_API_BASE=http://localhost:7071/api
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cd creator-fe
+npm install
+npm run dev
 ```
+
+UI runs at `http://localhost:5173`.
+
+```bash
+npm run lint       # ESLint check
+npm run build      # production build → dist/
+```
+
+## Environment variables
+
+All are build-time (Vite injects at build, not runtime).
+
+| Variable | Description | Required |
+|---|---|---|
+| `VITE_API_BASE` | Auth proxy base URL (default: `/api`) | No |
+
+## Pages
+
+| Route | Description |
+|---|---|
+| `/` | Home — links to Create and List |
+| `/create` | Create a short link with optional custom slug |
+| `/list` | Tabbed view of active and soft-deleted links |
+| `/403` | Shown when AAD user is not provisioned in MongoDB |
+| `/404` | Also receives redirects from `clinten.dev` when a slug is not found |
+
+## Deployment
+
+Triggers automatically on push to `main` when files under `creator-fe/` change. Stage deploys on push to `dev`. Uses the reusable [`deploy-fe-template.yml`](../.github/workflows/deploy-fe-template.yml) workflow, which runs lint, builds, deploys to SWA, and runs a smoke test against `/api/health`.
+
+- Prod SWA: `ashy-meadow-07aae3f0f.7.azurestaticapps.net` / `create.clinten.dev`
+- Stage SWA: `red-desert-04141eb0f.7.azurestaticapps.net`
+
+Each environment uses its own `SWA_DEPLOYMENT_TOKEN` GitHub secret scoped to the `prod` or `stage` GitHub environment.
+
+See [`.github/workflows/README.md`](../.github/workflows/README.md) for pipeline details.
