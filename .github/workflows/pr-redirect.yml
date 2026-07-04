@@ -1,0 +1,15 @@
+name: PR Checks - Redirect
+
+on:
+  pull_request:
+    paths:
+      - 'redirect/**'
+      - '.github/workflows/pr-redirect.yml'
+      - '.github/workflows/pr-go-template.yml'
+
+jobs:
+  checks:
+    uses: ./.github/workflows/pr-go-template.yml
+    with:
+      service: redirect
+      coverage_threshold: 90

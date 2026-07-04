@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -11,23 +12,29 @@ import (
 	"github.com/DevWalrus/UrlShortener/redirect/internal/cache"
 	"github.com/DevWalrus/UrlShortener/redirect/internal/db"
 	"github.com/go-chi/chi/v5"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Handler struct {
-	store       *db.LinkStore
-	cache       *cache.Cache
-	mongoClient *mongo.Client
+// Store is the data access interface required by the handler.
+type Store interface {
+	FindBySlug(ctx context.Context, slug string) (*db.Link, error)
+	IncrementHitCount(ctx context.Context, slug string)
 }
 
-func New(store *db.LinkStore, cache *cache.Cache, mongoClient *mongo.Client) *Handler {
-	return &Handler{store: store, cache: cache, mongoClient: mongoClient}
+type Handler struct {
+	store  Store
+	cache  *cache.Cache
+	pingFn func(ctx context.Context) error
+}
+
+// New creates a Handler. pingFn is called by HandleHealth to check DB liveness.
+func New(store Store, c *cache.Cache, pingFn func(ctx context.Context) error) *Handler {
+	return &Handler{store: store, cache: c, pingFn: pingFn}
 }
 
 func (h *Handler) HandleHealth(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
-	if err := db.Ping(ctx, h.mongoClient); err != nil {
+	if err := h.pingFn(ctx); err != nil {
 		http.Error(w, "mongodb unavailable", http.StatusServiceUnavailable)
 		return
 	}
@@ -73,7 +80,7 @@ func (h *Handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) renderNotFound(w http.ResponseWriter, r *http.Request) {
-	slug := chi.URLParam(r, "slug")
+	slug := html.EscapeString(chi.URLParam(r, "slug"))
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusNotFound)
 	fmt.Fprintf(w, `<!doctype html>

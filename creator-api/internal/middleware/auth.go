@@ -12,7 +12,12 @@ type contextKey string
 
 const UserContextKey contextKey = "user"
 
-func RequireUserToken(store *db.UserStore) func(http.Handler) http.Handler {
+// UserFinder is the data access interface required by the auth middleware.
+type UserFinder interface {
+	FindByToken(ctx context.Context, token string) (*db.User, error)
+}
+
+func RequireUserToken(store UserFinder) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			token := r.Header.Get("X-API-Key")

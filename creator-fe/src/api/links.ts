@@ -20,7 +20,6 @@ export interface CreateLinkRequest {
   customSlug?: string
 }
 
-
 export async function checkAuth(): Promise<void> {
   const res = await fetch(`${BASE}/auth`, { headers });
   if (res.status === 403) throw new ForbiddenError();

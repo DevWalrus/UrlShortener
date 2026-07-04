@@ -4,28 +4,38 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/DevWalrus/UrlShortener/creator-api/internal/db"
 	"github.com/DevWalrus/UrlShortener/creator-api/internal/slug"
 	"github.com/go-chi/chi/v5"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Handler struct {
-	store       *db.LinkStore
-	mongoClient *mongo.Client
+// Store is the data access interface required by the handler.
+type Store interface {
+	Create(ctx context.Context, link *db.Link) error
+	List(ctx context.Context) ([]db.Link, error)
+	ListDeleted(ctx context.Context) ([]db.Link, error)
+	Delete(ctx context.Context, slug string) error
+	Exists(ctx context.Context, slug string) (bool, error)
 }
 
-func New(store *db.LinkStore, mongoClient *mongo.Client) *Handler {
-	return &Handler{store: store, mongoClient: mongoClient}
+type Handler struct {
+	store  Store
+	pingFn func(ctx context.Context) error
+}
+
+// New creates a Handler. pingFn is called by HandleHealth to check DB liveness.
+func New(store Store, pingFn func(ctx context.Context) error) *Handler {
+	return &Handler{store: store, pingFn: pingFn}
 }
 
 func (h *Handler) HandleHealth(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
-	if err := db.Ping(ctx, h.mongoClient); err != nil {
+	if err := h.pingFn(ctx); err != nil {
 		http.Error(w, "mongodb unavailable", http.StatusServiceUnavailable)
 		return
 	}
@@ -53,6 +63,11 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 
 	if req.Destination == "" {
 		http.Error(w, "destination is required", http.StatusBadRequest)
+		return
+	}
+
+	if parsed, err := url.Parse(req.Destination); err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") {
+		http.Error(w, "destination must be a valid http or https URL", http.StatusBadRequest)
 		return
 	}
 
