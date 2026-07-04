@@ -6,6 +6,9 @@ on:
       - 'creator-fe/**'
       - '.github/workflows/pr-creator-fe.yml'
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
@@ -36,6 +39,37 @@ jobs:
 
       - name: Lint API
         run: npm run lint
+        working-directory: creator-fe/api
+
+  test:
+    name: Test (with coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            creator-fe/package-lock.json
+            creator-fe/api/package-lock.json
+
+      - name: Install frontend deps
+        run: npm ci
+        working-directory: creator-fe
+
+      - name: Install API deps
+        run: npm ci
+        working-directory: creator-fe/api
+
+      - name: Test frontend (coverage ≥ 90%)
+        run: npm run test:coverage
+        working-directory: creator-fe
+
+      - name: Test API (coverage ≥ 90%)
+        run: npm run test:coverage
         working-directory: creator-fe/api
 
   build:

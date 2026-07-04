@@ -68,18 +68,18 @@ resource "azurerm_container_app" "redirect" {
       }
 
       liveness_probe {
-        transport = "HTTP"
-        path      = "/health"
-        port      = 8080
-        initial_delay            = 5
-        interval_seconds         = 10
-        failure_count_threshold  = 3
+        transport               = "HTTP"
+        path                    = "/health"
+        port                    = 8080
+        initial_delay           = 5
+        interval_seconds        = 10
+        failure_count_threshold = 3
       }
 
       readiness_probe {
-        transport = "HTTP"
-        path      = "/health"
-        port      = 8080
+        transport               = "HTTP"
+        path                    = "/health"
+        port                    = 8080
         interval_seconds        = 10
         failure_count_threshold = 3
       }
@@ -162,18 +162,18 @@ resource "azurerm_container_app" "creator_api_stage" {
       }
 
       liveness_probe {
-        transport = "HTTP"
-        path      = "/health"
-        port      = 8080
-        initial_delay            = 5
-        interval_seconds         = 10
-        failure_count_threshold  = 3
+        transport               = "HTTP"
+        path                    = "/health"
+        port                    = 8080
+        initial_delay           = 5
+        interval_seconds        = 10
+        failure_count_threshold = 3
       }
 
       readiness_probe {
-        transport = "HTTP"
-        path      = "/health"
-        port      = 8080
+        transport               = "HTTP"
+        path                    = "/health"
+        port                    = 8080
         interval_seconds        = 10
         failure_count_threshold = 3
       }
@@ -237,18 +237,18 @@ resource "azurerm_container_app" "creator_api" {
       }
 
       liveness_probe {
-        transport = "HTTP"
-        path      = "/health"
-        port      = 8080
-        initial_delay            = 5
-        interval_seconds         = 10
-        failure_count_threshold  = 3
+        transport               = "HTTP"
+        path                    = "/health"
+        port                    = 8080
+        initial_delay           = 5
+        interval_seconds        = 10
+        failure_count_threshold = 3
       }
 
       readiness_probe {
-        transport = "HTTP"
-        path      = "/health"
-        port      = 8080
+        transport               = "HTTP"
+        path                    = "/health"
+        port                    = 8080
         interval_seconds        = 10
         failure_count_threshold = 3
       }

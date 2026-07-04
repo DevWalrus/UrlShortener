@@ -2,13 +2,13 @@ import { HttpRequest } from '@azure/functions';
 import { getDb } from './db';
 
 export type UserRecord = {
-  apiToken?: string;
-  email?: string;
-  revokedAt?: unknown;
+  apiToken?: string
+  email?: string
+  revokedAt?: unknown
 };
 
 type ClientPrincipal = {
-  userDetails?: unknown;
+  userDetails?: unknown
 };
 
 export async function getUserFromRequest(req: HttpRequest): Promise<UserRecord | null> {
@@ -18,7 +18,8 @@ export async function getUserFromRequest(req: HttpRequest): Promise<UserRecord |
   let principal: ClientPrincipal;
   try {
     principal = JSON.parse(Buffer.from(principalHeader, 'base64').toString('utf8')) as ClientPrincipal;
-  } catch {
+  }
+  catch {
     return null;
   }
 

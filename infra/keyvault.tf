@@ -8,6 +8,12 @@ resource "azurerm_key_vault" "main" {
   sku_name                   = "standard"
   soft_delete_retention_days = 7
   purge_protection_enabled   = false
+
+  network_acls {
+    default_action = "Deny"
+    bypass         = "AzureServices"
+    ip_rules       = [var.terraform_runner_ip]
+  }
 }
 
 resource "azurerm_key_vault_access_policy" "terraform" {

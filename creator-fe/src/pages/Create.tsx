@@ -37,10 +37,18 @@ export default function Create() {
       toast.success('Short link created!');
       setDestination('');
       setCustomSlug('');
-    } catch (err: any) {
+    }
+    catch (err: unknown) {
       handleError(err);
-      toast.error(err.message || 'Something went wrong');
-    } finally {
+
+      let errorMessage = 'Something went wrong';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      toast.error(errorMessage);
+    }
+    finally {
       setLoading(false);
     }
   }
@@ -62,7 +70,7 @@ export default function Create() {
             label="Destination URL"
             placeholder="https://example.com/very/long/url"
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            onChange={e => setDestination(e.target.value)}
             required
             fullWidth
             type="url"
@@ -100,12 +108,12 @@ export default function Create() {
           </Typography>
           <FormControl sx={{ m: 1, width: '50ch' }} variant="outlined">
             <OutlinedInput
-              id={'short-link'}
-              type={'text'}
+              id="short-link"
+              type="text"
               value={shortUrl}
               readOnly
               fullWidth
-              endAdornment={
+              endAdornment={(
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="Copy short link to clipboard"
@@ -115,7 +123,7 @@ export default function Create() {
                     <ContentCopyIcon />
                   </IconButton>
                 </InputAdornment>
-              }
+              )}
             />
           </FormControl>
         </Paper>
