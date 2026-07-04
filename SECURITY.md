@@ -21,6 +21,17 @@ Send a private report instead and include:
 
 - API tokens are stored in plaintext in MongoDB. If the database is breached, tokens could be used to make requests to the backend API on behalf of users. Mitigated by: tokens are not user-facing or user-manageable, the database connection string is stored in Azure Key Vault, and tokens can be rotated server-side at any time.
 
+## Automated security checks
+
+The following tools run automatically on every push and pull request to `main` and `dev`:
+
+- **gitleaks** — scans git history for accidentally committed secrets
+- **govulncheck** — checks Go services against the Go vulnerability database
+- **npm audit** — checks Node packages for known CVEs (fails on HIGH or CRITICAL)
+- **Trivy** — scans container images for OS and binary CVEs before each deploy (fails on CRITICAL or HIGH with a fix available)
+
+Dependabot runs weekly and opens PRs for outdated dependencies across npm, Go modules, Docker base images, and GitHub Actions.
+
 ## Public releases
 
 Before making this repository public, verify that:
@@ -29,3 +40,4 @@ Before making this repository public, verify that:
 - Terraform state and variable files are not committed
 - build artifacts and dependency folders remain ignored
 - deployment secrets are sourced from the cloud secret store, not from source control
+- GitHub Secret Scanning and push protection are enabled in repository settings
