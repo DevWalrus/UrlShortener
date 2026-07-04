@@ -25,7 +25,6 @@ export default defineConfig([
     },
     rules: {
       '@stylistic/semi': ['error', 'always'],
-      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {

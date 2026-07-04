@@ -38,9 +38,15 @@ export default function Create() {
       setDestination('');
       setCustomSlug('');
     }
-    catch (err: any) {
+    catch (err: unknown) {
       handleError(err);
-      toast.error(err.message || 'Something went wrong');
+
+      let errorMessage = 'Something went wrong';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      toast.error(errorMessage);
     }
     finally {
       setLoading(false);
