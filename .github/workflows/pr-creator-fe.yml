@@ -6,6 +6,9 @@ on:
       - 'creator-fe/**'
       - '.github/workflows/pr-creator-fe.yml'
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint
