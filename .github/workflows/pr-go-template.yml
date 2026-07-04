@@ -18,6 +18,9 @@ on:
         default: 90
         description: "Minimum acceptable coverage percentage"
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint

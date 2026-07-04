@@ -16,6 +16,10 @@ on:
       SWA_DEPLOYMENT_TOKEN:
         required: true
 
+permissions:
+  contents: read
+  statuses: write  # required for SWA deploy action to post deployment status
+
 jobs:
   lint:
     name: Lint

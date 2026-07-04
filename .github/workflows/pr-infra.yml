@@ -13,6 +13,9 @@ on:
       - '.github/workflows/pr-infra.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Terraform Validate

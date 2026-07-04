@@ -7,6 +7,9 @@ on:
       - '.github/workflows/pr-redirect.yml'
       - '.github/workflows/pr-go-template.yml'
 
+permissions:
+  contents: read
+
 jobs:
   checks:
     uses: ./.github/workflows/pr-go-template.yml
