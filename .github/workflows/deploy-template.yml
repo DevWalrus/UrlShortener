@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and push image (prod)
         if: inputs.image_tag == 'latest'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./${{ inputs.service_name }}
           push: true
@@ -65,7 +65,7 @@ jobs:
 
       - name: Build and push image (stage)
         if: inputs.image_tag != 'latest'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./${{ inputs.service_name }}
           push: true
