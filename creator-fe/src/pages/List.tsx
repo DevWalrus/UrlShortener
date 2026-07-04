@@ -32,9 +32,11 @@ export default function List() {
       const [a, d] = await Promise.all([listLinks(), listDeletedLinks()]);
       setActive(a);
       setDeleted(d);
-    } catch {
+    }
+    catch {
       toast.error('Failed to load links');
-    } finally {
+    }
+    finally {
       setLoading(false);
     }
   }
@@ -44,15 +46,25 @@ export default function List() {
     async function load() {
       try {
         const [a, d] = await Promise.all([listLinks(), listDeletedLinks()]);
-        if (!cancelled) { setActive(a); setDeleted(d); }
-      } catch (e) {
-        if (!cancelled) { handleError(e); toast.error('Failed to load links'); }
-      } finally {
+        if (!cancelled) {
+          setActive(a);
+          setDeleted(d);
+        }
+      }
+      catch (e) {
+        if (!cancelled) {
+          handleError(e);
+          toast.error('Failed to load links');
+        }
+      }
+      finally {
         setLoading(false);
       }
     }
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [handleError]);
 
   async function handleDelete() {
@@ -62,10 +74,12 @@ export default function List() {
       await deleteLink(confirmSlug);
       toast.success(`${confirmSlug} deleted`);
       await loadLinks();
-    } catch (e) {
+    }
+    catch (e) {
       handleError(e);
       toast.error('Failed to delete link');
-    } finally {
+    }
+    finally {
       setConfirmSlug(null);
     }
   }
@@ -120,7 +134,7 @@ export default function List() {
                 </TableCell>
               </TableRow>
             )}
-            {active.map((link) => (
+            {active.map(link => (
               <TableRow key={link.slug}>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -176,7 +190,7 @@ export default function List() {
                 </TableCell>
               </TableRow>
             )}
-            {deleted.map((link) => (
+            {deleted.map(link => (
               <TableRow key={link.slug} sx={{ opacity: 0.6 }}>
                 <TableCell>
                   <Chip label={link.slug} size="small" variant="outlined" />

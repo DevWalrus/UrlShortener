@@ -15,6 +15,7 @@ export default defineConfig([
       tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
+      stylistic.configs.recommended,
     ],
     plugins: {
       '@stylistic': stylistic,
