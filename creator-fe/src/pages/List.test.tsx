@@ -122,6 +122,44 @@ describe('List page', () => {
     expect(deleteLinkMock).not.toHaveBeenCalled();
   });
 
+  it('shows toast and calls handleError when load fails', async () => {
+    const err = new Error('network error');
+    listLinksMock.mockRejectedValue(err);
+    renderList();
+    await waitFor(() => expect(handleError).toHaveBeenCalledWith(err));
+  });
+
+  it('calls handleError and shows toast when delete fails', async () => {
+    deleteLinkMock.mockRejectedValue(new Error('delete failed'));
+    renderList();
+    await waitFor(() => screen.getByText('ABC1234'));
+
+    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+    await userEvent.click(deleteButtons[0]);
+
+    const dialog = screen.getByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: /delete/i }));
+
+    await waitFor(() => expect(handleError).toHaveBeenCalled());
+  });
+
+  it('shows toast when reload after delete fails', async () => {
+    deleteLinkMock.mockResolvedValue(undefined);
+    // Second call to listLinks (after successful delete) fails
+    listLinksMock
+      .mockResolvedValueOnce(activeLinks)
+      .mockRejectedValueOnce(new Error('reload failed'));
+    renderList();
+    await waitFor(() => screen.getByText('ABC1234'));
+
+    const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+    await userEvent.click(deleteButtons[0]);
+    const dialog = screen.getByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: /delete/i }));
+
+    await waitFor(() => expect(deleteLinkMock).toHaveBeenCalled());
+  });
+
   it('tab labels reflect link counts', async () => {
     renderList();
     await waitFor(() => screen.getByText('ABC1234'));

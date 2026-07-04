@@ -100,6 +100,11 @@ describe('listLinks', () => {
     mockFetch(403);
     await expect(listLinks()).rejects.toBeInstanceOf(ForbiddenError);
   });
+
+  it('throws generic Error on other non-ok status', async () => {
+    mockFetch(500);
+    await expect(listLinks()).rejects.toThrow('Failed to fetch links');
+  });
 });
 
 describe('listDeletedLinks', () => {
@@ -111,6 +116,11 @@ describe('listDeletedLinks', () => {
   it('throws ForbiddenError on 403', async () => {
     mockFetch(403);
     await expect(listDeletedLinks()).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it('throws generic Error on other non-ok status', async () => {
+    mockFetch(500);
+    await expect(listDeletedLinks()).rejects.toThrow('Failed to fetch deleted links');
   });
 });
 

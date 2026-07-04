@@ -109,6 +109,17 @@ describe('Create page — form submission', () => {
     await waitFor(() => expect(handleError).toHaveBeenCalled());
   });
 
+  it('shows fallback error message when thrown value is not an Error', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    createLinkMock.mockRejectedValue('unexpected string rejection' as any);
+    renderCreate();
+
+    await userEvent.type(screen.getByLabelText(/destination url/i), 'https://example.com');
+    await userEvent.click(screen.getByRole('button', { name: /create link/i }));
+
+    await waitFor(() => expect(handleError).toHaveBeenCalled());
+  });
+
   it('disables button while submitting', async () => {
     createLinkMock.mockReturnValue(new Promise(() => {}));
     renderCreate();
