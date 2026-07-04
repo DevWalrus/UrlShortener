@@ -6,7 +6,8 @@ async function handler(_req: HttpRequest, _context: InvocationContext): Promise<
     const db = await getDb();
     await db.command({ ping: 1 });
     return { status: 200, body: 'ok' };
-  } catch {
+  }
+  catch {
     return { status: 503, body: 'mongodb unavailable' };
   }
 }

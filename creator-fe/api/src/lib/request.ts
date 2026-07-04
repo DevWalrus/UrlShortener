@@ -39,7 +39,8 @@ export async function sendRequest(endpoint: string, req: HttpRequest): Promise<H
       headers,
       body,
     });
-  } catch {
+  }
+  catch {
     return { status: 502, body: 'Bad Gateway' };
   }
 
