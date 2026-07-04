@@ -67,3 +67,29 @@ jobs:
       - name: Run npm audit
         run: npm audit --audit-level=high
         working-directory: ${{ matrix.package }}
+
+  trivy:
+    name: Trivy Image Scan (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [redirect, creator-api]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          push: false
+          load: true
+          tags: scan/${{ matrix.service }}:pr
+
+      - name: Scan with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: scan/${{ matrix.service }}:pr
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
