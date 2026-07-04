@@ -4,21 +4,33 @@ updates:
     directory: /creator-fe
     schedule:
       interval: weekly
+    groups:
+      npm-all:
+        patterns: ["*"]
 
   - package-ecosystem: npm
     directory: /creator-fe/api
     schedule:
       interval: weekly
+    groups:
+      npm-all:
+        patterns: ["*"]
 
   - package-ecosystem: gomod
     directory: /redirect
     schedule:
       interval: weekly
+    groups:
+      go-all:
+        patterns: ["*"]
 
   - package-ecosystem: gomod
     directory: /creator-api
     schedule:
       interval: weekly
+    groups:
+      go-all:
+        patterns: ["*"]
 
   - package-ecosystem: docker
     directory: /redirect
@@ -34,3 +46,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      actions-all:
+        patterns: ["*"]
