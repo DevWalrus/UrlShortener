@@ -1,5 +1,12 @@
 data "azurerm_client_config" "current" {}
 
+# The vault's network firewall stays open (default_action = "Allow"). Azure Container Apps is NOT a
+# "trusted Microsoft service" for Key Vault, so with "Deny" the apps can't resolve their Key Vault
+# secret references and every container app goes to provisioningState=Failed. That took clinten.dev
+# down from 2026-07-04 until 2026-11-25. Access is still gated by Entra ID auth and the access
+# policies below. Locking the network down again needs a VNet-integrated Container Apps environment
+# plus a private endpoint, not an IP allow-list (Consumption outbound IPs aren't guaranteed static).
+#trivy:ignore:AVD-AZU-0013
 resource "azurerm_key_vault" "main" {
   name                       = "${var.project}-kv"
   resource_group_name        = azurerm_resource_group.main.name
@@ -10,7 +17,7 @@ resource "azurerm_key_vault" "main" {
   purge_protection_enabled   = false
 
   network_acls {
-    default_action = "Deny"
+    default_action = "Allow"
     bypass         = "AzureServices"
     ip_rules       = [var.terraform_runner_ip]
   }
